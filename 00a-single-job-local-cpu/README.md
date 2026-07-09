@@ -1,12 +1,16 @@
-# 00 — Single-job, local CPU (no Slurm)
+# 00a — Single-job, local CPU (no Slurm)
 
 **Type:** single-job. **Where it runs:** your laptop (or a login node), on CPU, with no Slurm at all.
 
 Start here. Before you touch the cluster, prove to yourself that the training
 script works on your own machine. Everything you learn here — the data folder,
-the output folder, the runtime folder that enables resume — works *identically*
-on the cluster; the only thing the later examples add is Slurm to launch the job
-on a compute node.
+the output folder — works *identically* on the cluster; the only thing the later
+examples add is Slurm to launch the job on a compute node.
+
+> The **00 examples all run locally, no Slurm**, and introduce one idea each:
+> **00a** plain training (here) → **00b** checkpoint/resume → **00c** Comet.ml
+> logging. Once you've done all three, the cluster examples (01+) just wrap the
+> same `train.py` in Slurm.
 
 ## 1. Make a local environment
 
@@ -39,7 +43,6 @@ python ../common/train.py \
     --device cpu \
     --data-dir /tmp/moons/data \
     --out-dir /tmp/moons/out \
-    --checkpoint-dir /tmp/moons/runtime \
     --epochs 50 --lr 0.05
 ```
 
@@ -48,14 +51,8 @@ and a final `final test accuracy = ...` around 0.85–0.90. You get:
 
 - `/tmp/moons/out/metrics.json` — final metrics
 - `/tmp/moons/out/model.pt` — trained weights
-- `/tmp/moons/runtime/train.log` — one CSV line per epoch
-- `/tmp/moons/runtime/checkpoint.pt` — latest checkpoint
 
-## 4. See resume work locally
+This is deliberately the bare minimum: just train and save the result. No
+checkpointing, no experiment tracking — those come next.
 
-Kill it with `Ctrl-C` partway through, then re-run the **exact same command**.
-It prints `[resume] ... resuming from epoch N` and continues where it left off,
-appending to `train.log`. This is the same mechanism example
-[07](../07-single-job-checkpoint-resume/) demonstrates against a real Slurm kill.
-
-Once this works locally, move on to [01 — single-job sbatch CPU](../01-single-job-sbatch-cpu/).
+Next: [00b — checkpoint & resume, locally](../00b-single-job-local-cpu/).

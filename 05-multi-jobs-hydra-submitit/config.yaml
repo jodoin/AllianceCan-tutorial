@@ -15,7 +15,6 @@ device: cpu       # set to cuda AND uncomment gpus_per_node below for a GPU swee
 
 data_dir: ???     # provided on the CLI (points at $SCRATCH)
 out_dir: ???      # provided on the CLI
-checkpoint_dir: null
 
 hydra:
   # submitit-slurm launcher = the bridge between Hydra --multirun and sbatch.

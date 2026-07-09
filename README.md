@@ -9,11 +9,15 @@ regression** on the `make_moons` toy dataset — so that all your attention goes
 to the thing that's actually new: **how you launch jobs on a cluster**. Every
 example trains the exact same tiny model; what changes is *how it's launched*.
 
-## The seven examples (run them in order)
+## The examples (run them in order)
+
+Three local warm-ups (`00a`/`00b`/`00c`, no Slurm) then seven cluster examples:
 
 | # | Folder | Single- or multi-jobs | Teaches |
 |---|--------|----------------------|---------|
-| 00 | [`00-single-job-local-cpu`](00-single-job-local-cpu/) | single-job | Run it on your laptop first, no Slurm |
+| 00a | [`00a-single-job-local-cpu`](00a-single-job-local-cpu/) | single-job | Run it on your laptop first, no Slurm |
+| 00b | [`00b-single-job-local-cpu`](00b-single-job-local-cpu/) | single-job | Checkpoint & resume, locally |
+| 00c | [`00c-single-job-local-cpu`](00c-single-job-local-cpu/) | single-job | Comet.ml logging, locally |
 | 01 | [`01-single-job-sbatch-cpu`](01-single-job-sbatch-cpu/) | single-job | The minimal `sbatch` script (CPU) |
 | 02 | [`02-single-job-sbatch-gpu`](02-single-job-sbatch-gpu/) | single-job | Add a GPU (`--gpus-per-node=1`) |
 | 03 | [`03-multi-jobs-sbatch-array`](03-multi-jobs-sbatch-array/) | multi-jobs | Job **array**: many jobs from one submit |
@@ -36,14 +40,17 @@ example trains the exact same tiny model; what changes is *how it's launched*.
 ├── common/                        <- the ONLY place the model/training code lives
 │   ├── model.py                   <- the 2-layer logistic regression
 │   ├── prepare_data.py            <- make_moons -> .npz (run on the LOGIN node)
-│   ├── train.py                   <- CLI training loop w/ checkpoint/resume
+│   ├── train.py                   <- CLI training loop (composes the two below)
+│   ├── recovery.py                <- opt-in checkpoint/resume, used by 07
+│   ├── comet.py                   <- opt-in Comet.ml logging, used by 06
 │   └── train_hydra.py             <- thin Hydra wrapper around train.py (04, 05)
-└── 00.. 07/                       <- each: a README + its launch files only
+├── 00a/ 00b/ 00c/                 <- local (no-Slurm) intros: plain, recovery, comet
+└── 01.. 07/                       <- cluster examples: a README + launch files
 ```
 
 The numbered folders contain **only launch files** (`job.sh` / `config.yaml`) and
-a README. Every `job.sh` calls `../common/train.py`, so there is a single source
-of truth for the model.
+a README (the 00 folders are local walkthroughs, so README only). Every `job.sh`
+calls `../common/train.py`, so there is a single source of truth for the model.
 
 ---
 

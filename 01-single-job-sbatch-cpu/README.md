@@ -3,7 +3,7 @@
 **Type:** single-job (one Slurm job from one submission). **Runs on:** a Narval CPU compute node.
 
 This is the Slurm "hello world": take the exact training run you did locally in
-[00](../00-single-job-local-cpu/) and hand it to the scheduler with `sbatch`.
+[00a](../00a-single-job-local-cpu/) and hand it to the scheduler with `sbatch`.
 
 ## Prerequisites (do once, see top [README](../README.md))
 
@@ -43,7 +43,6 @@ cat slurm-moons-cpu-<jobid>.out
 ```
 
 **Output lands in** `$SCRATCH/moons-tutorial/results/moons-cpu-<jobid>/`
-(`metrics.json`, `model.pt`, and a `runtime/` folder with `train.log` +
-`checkpoint.pt`). Final test accuracy ≈ 0.85–0.90.
+(`metrics.json` and `model.pt`). Final test accuracy ≈ 0.85–0.90.
 
 Next: [02 — add a GPU](../02-single-job-sbatch-gpu/).
