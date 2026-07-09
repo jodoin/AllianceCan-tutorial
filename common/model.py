@@ -27,6 +27,13 @@ class MoonsNet(nn.Module):
     """
 
     def __init__(self, in_features: int = 2, hidden: int = 16, num_classes: int = 2):
+        """Build the Linear -> ReLU -> Linear stack from the given dimensions.
+
+        Args:
+            in_features: number of input features per sample (2 for make_moons).
+            hidden: width of the hidden layer.
+            num_classes: number of output classes (2 for make_moons).
+        """
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(in_features, hidden),
@@ -35,5 +42,10 @@ class MoonsNet(nn.Module):
         )
 
     def forward(self, x):
+        """Run a forward pass and return raw class logits.
+
+        Args:
+            x: input feature batch of shape (N, in_features).
+        """
         # Returns raw logits; cross-entropy loss applies softmax internally.
         return self.net(x)

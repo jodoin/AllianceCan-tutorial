@@ -24,7 +24,11 @@ import torch
 
 
 def add_arguments(parser):
-    """Register recovery CLI flags on an argparse parser."""
+    """Register recovery CLI flags on an argparse parser.
+
+    Args:
+        parser: the argparse.ArgumentParser to add the recovery flags to.
+    """
     group = parser.add_argument_group("recovery (checkpoint/resume, example 07)")
     group.add_argument("--checkpoint-dir", default=None,
                        help="Runtime folder for train.log + checkpoint.pt. If omitted, "
@@ -44,6 +48,14 @@ class Recovery:
     """Runtime-folder checkpoint/resume + per-epoch log. No-ops when disabled."""
 
     def __init__(self, checkpoint_dir=None, checkpoint_every=2, resume=True):
+        """Set up paths and state; stay disabled if `checkpoint_dir` is None.
+
+        Args:
+            checkpoint_dir: runtime folder for train.log + checkpoint.pt; None
+                disables recovery entirely (every method becomes a no-op).
+            checkpoint_every: save a checkpoint every this many epochs.
+            resume: whether to resume from an existing checkpoint if present.
+        """
         self.enabled = checkpoint_dir is not None
         self.every = checkpoint_every
         self.resume = resume
@@ -57,6 +69,11 @@ class Recovery:
 
     @classmethod
     def from_args(cls, args):
+        """Construct a Recovery from parsed argparse args.
+
+        Args:
+            args: parsed args carrying checkpoint_dir, checkpoint_every, resume.
+        """
         return cls(args.checkpoint_dir, args.checkpoint_every, args.resume)
 
     # --- signal handling (the "automatic" preemption path) ----------------
@@ -66,16 +83,29 @@ class Recovery:
             signal.signal(signal.SIGTERM, self._on_sigterm)
 
     def _on_sigterm(self, signum, frame):
+        """SIGTERM handler: flag a stop so the loop checkpoints then exits.
+
+        Args:
+            signum: the signal number delivered (unused; required by signal API).
+            frame: the interrupted stack frame (unused; required by signal API).
+        """
         self._stop_requested = True
         print("[signal] SIGTERM received — will checkpoint after this epoch and exit.",
               flush=True)
 
     def stop_requested(self) -> bool:
+        """True once SIGTERM has asked the loop to checkpoint and stop."""
         return self._stop_requested
 
     # --- resume -----------------------------------------------------------
     def resume_epoch(self, model, optimizer, device) -> int:
-        """Return the next epoch to run: 0 fresh, or epoch+1 from a checkpoint."""
+        """Return the next epoch to run: 0 fresh, or epoch+1 from a checkpoint.
+
+        Args:
+            model: model whose weights are restored in place from the checkpoint.
+            optimizer: optimizer whose state is restored in place.
+            device: device to map the loaded checkpoint tensors onto.
+        """
         if not self.enabled:
             return 0
         if not self.resume:
@@ -100,6 +130,11 @@ class Recovery:
 
     # --- per-epoch log ----------------------------------------------------
     def open_log(self, start_epoch: int):
+        """Open train.log for writing (append when resuming), writing a header if new.
+
+        Args:
+            start_epoch: first epoch about to run; >0 means resuming, so append.
+        """
         if not self.enabled:
             return
         is_new = start_epoch == 0 or not os.path.exists(self.log_path)
@@ -111,6 +146,13 @@ class Recovery:
             self._log_file.flush()
 
     def log_epoch(self, epoch: int, train_loss: float, test_acc: float):
+        """Append one CSV row for this epoch and flush immediately.
+
+        Args:
+            epoch: zero-based epoch index just completed.
+            train_loss: training loss for this epoch.
+            test_acc: test-set accuracy for this epoch.
+        """
         if not self.enabled:
             return
         ts = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -118,11 +160,19 @@ class Recovery:
         self._log_file.flush()  # flush every epoch so a sudden kill can't lose it
 
     def close_log(self):
+        """Close the log file handle if one is open."""
         if self._log_file is not None:
             self._log_file.close()
 
     # --- checkpointing ----------------------------------------------------
     def _save(self, model, optimizer, epoch: int):
+        """Atomically write model + optimizer + epoch + RNG state to checkpoint.pt.
+
+        Args:
+            model: model whose state_dict is saved.
+            optimizer: optimizer whose state_dict is saved.
+            epoch: epoch index stored so resume knows where to continue.
+        """
         tmp = self.ckpt_path + ".tmp"
         ckpt = {
             "epoch": epoch,
@@ -137,9 +187,24 @@ class Recovery:
         os.replace(tmp, self.ckpt_path)  # atomic: a kill mid-write can't corrupt it
 
     def checkpoint_if_due(self, model, optimizer, epoch: int, total_epochs: int):
+        """Save a checkpoint every N epochs and on the final epoch.
+
+        Args:
+            model: model to checkpoint.
+            optimizer: optimizer to checkpoint.
+            epoch: zero-based epoch index just completed.
+            total_epochs: total number of epochs in this run (to detect the last).
+        """
         if self.enabled and ((epoch + 1) % self.every == 0 or epoch == total_epochs - 1):
             self._save(model, optimizer, epoch)
 
     def checkpoint_now(self, model, optimizer, epoch: int):
+        """Force an immediate checkpoint (e.g. on SIGTERM before exit).
+
+        Args:
+            model: model to checkpoint.
+            optimizer: optimizer to checkpoint.
+            epoch: zero-based epoch index just completed.
+        """
         if self.enabled:
             self._save(model, optimizer, epoch)

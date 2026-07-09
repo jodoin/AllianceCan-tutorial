@@ -36,6 +36,7 @@ def default_data_dir() -> str:
 
 
 def main():
+    """Parse args, generate make_moons, and write train.npz / test.npz."""
     parser = argparse.ArgumentParser(description="Generate make_moons and save train/test .npz")
     parser.add_argument("--data-dir", default=default_data_dir(),
                         help="Where to write train.npz / test.npz "

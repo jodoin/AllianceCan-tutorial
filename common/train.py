@@ -38,7 +38,11 @@ import comet as comet_mod           # noqa: E402
 
 
 def resolve_device(requested: str) -> torch.device:
-    """Turn a --device string into a real torch.device, with CPU fallback."""
+    """Turn a --device string into a real torch.device, with CPU fallback.
+
+    Args:
+        requested: one of "auto", "cpu", or "cuda" (from the --device flag).
+    """
     if requested in ("auto", None):
         return torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if requested == "cuda" and not torch.cuda.is_available():
@@ -49,6 +53,13 @@ def resolve_device(requested: str) -> torch.device:
 
 
 def load_split(data_dir: str, name: str, device: torch.device):
+    """Load a named .npz split (train/test) as tensors on `device`.
+
+    Args:
+        data_dir: folder containing train.npz / test.npz.
+        name: split name to load, e.g. "train" or "test".
+        device: torch device the returned tensors are moved to.
+    """
     path = os.path.join(data_dir, f"{name}.npz")
     if not os.path.exists(path):
         raise FileNotFoundError(
@@ -62,6 +73,13 @@ def load_split(data_dir: str, name: str, device: torch.device):
 
 
 def evaluate(model, X, y) -> float:
+    """Return classification accuracy of `model` on the given data.
+
+    Args:
+        model: the network to evaluate (put in eval mode internally).
+        X: input features, shape (N, in_features).
+        y: ground-truth integer class labels, shape (N,).
+    """
     model.eval()
     with torch.no_grad():
         preds = model(X).argmax(dim=1)
@@ -69,6 +87,7 @@ def evaluate(model, X, y) -> float:
 
 
 def build_parser():
+    """Build the argparse parser (core flags + recovery/comet feature flags)."""
     parser = argparse.ArgumentParser(description="Train MoonsNet.")
     parser.add_argument("--data-dir", required=True,
                         help="Folder containing train.npz / test.npz (from prepare_data.py).")
@@ -87,6 +106,7 @@ def build_parser():
 
 
 def main():
+    """Train and test MoonsNet, wiring in optional recovery and Comet logging."""
     args = build_parser().parse_args()
 
     device = resolve_device(args.device)
@@ -119,13 +139,14 @@ def main():
               f"({args.epochs}); nothing to do.", flush=True)
 
     test_acc = evaluate(model, X_test, y_test)
+    # Start SGD.  Note batch size = training set size
     for epoch in range(start_epoch, args.epochs):
-        model.train()
-        optimizer.zero_grad()
-        logits = model(X_train)
-        loss = criterion(logits, y_train)
-        loss.backward()
-        optimizer.step()
+        model.train()                       # set model in training mode
+        optimizer.zero_grad()               # reset gradients
+        logits = model(X_train)             # forward pass
+        loss = criterion(logits, y_train)   # compute loss
+        loss.backward()                     # compute gradients via backprop
+        optimizer.step()                    # gradient descent
 
         train_loss = loss.item()
         test_acc = evaluate(model, X_test, y_test)
