@@ -36,6 +36,7 @@ python ../common/prepare_data.py --data-dir /tmp/moons/data
 
 ```bash
 python ../common/train.py \
+    --device cpu \
     --data-dir /tmp/moons/data \
     --out-dir /tmp/moons/out \
     --checkpoint-dir /tmp/moons/runtime \
