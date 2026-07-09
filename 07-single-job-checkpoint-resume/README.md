@@ -68,8 +68,8 @@ docs.
 
 ## On a laptop
 
-The same mechanism works with no Slurm: run the command from
-[00](../00-single-job-local-cpu/), `Ctrl-C` partway, and re-run — it resumes
-from the local runtime folder.
+The same mechanism works with no Slurm — that's exactly what
+[00b](../00b-single-job-local-cpu/) walks through: run it, `Ctrl-C` partway, and
+re-run — it resumes from the local runtime folder.
 
 That's the last example — back to the top [README](../README.md).

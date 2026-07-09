@@ -17,7 +17,6 @@ device: cuda
 # Filled in by job.sh via CLI overrides so paths point at $SCRATCH at run time.
 data_dir: ???
 out_dir: ???
-checkpoint_dir: null
 
 # Keep Hydra's own output/logging dir tidy (relative to where you launch).
 hydra:
