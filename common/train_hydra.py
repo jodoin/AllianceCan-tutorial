@@ -26,6 +26,13 @@ import train as train_module  # noqa: E402
 
 @hydra.main(version_base=None, config_path=None, config_name="config")
 def main(cfg: DictConfig):
+    """Translate the Hydra config into train.py's CLI args and run it.
+
+    Args:
+        cfg: the Hydra config (from config.yaml + CLI overrides), holding
+            data_dir, out_dir, epochs, lr, seed, hidden, device, and optionally
+            checkpoint_dir.
+    """
     print("[hydra] Resolved config:\n" + OmegaConf.to_yaml(cfg), flush=True)
 
     # Rebuild argv for common/train.py's argparse, then reuse its main().

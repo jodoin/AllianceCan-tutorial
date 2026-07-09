@@ -14,7 +14,11 @@ hardcoded. See 06-single-job-comet/README.md.
 
 
 def add_arguments(parser):
-    """Register Comet CLI flags on an argparse parser."""
+    """Register Comet CLI flags on an argparse parser.
+
+    Args:
+        parser: the argparse.ArgumentParser to add the Comet flags to.
+    """
     group = parser.add_argument_group("comet (optional, example 06)")
     group.add_argument("--comet", action="store_true",
                        help="Log training curves to Comet.ml (needs comet_ml installed).")
@@ -30,27 +34,51 @@ class CometLogger:
     """Thin wrapper around a comet_ml experiment; no-ops when disabled."""
 
     def __init__(self, experiment=None):
+        """Wrap a comet_ml experiment, or None to make every method a no-op.
+
+        Args:
+            experiment: a comet_ml Experiment/OfflineExperiment, or None to disable.
+        """
         self._exp = experiment
 
     @property
     def enabled(self) -> bool:
+        """True if a real Comet experiment is attached."""
         return self._exp is not None
 
     def log_parameters(self, params: dict):
+        """Log run hyperparameters to Comet (no-op when disabled).
+
+        Args:
+            params: mapping of hyperparameter name -> value.
+        """
         if self._exp is not None:
             self._exp.log_parameters(params)
 
     def log_metric(self, name: str, value, step=None):
+        """Log a single metric value at an optional step (no-op when disabled).
+
+        Args:
+            name: metric name, e.g. "train_loss".
+            value: the metric value to record.
+            step: optional step/epoch index the value belongs to.
+        """
         if self._exp is not None:
             self._exp.log_metric(name, value, step=step)
 
     def end(self):
+        """Finalize the experiment so Comet flushes/uploads it (no-op when disabled)."""
         if self._exp is not None:
             self._exp.end()
 
 
 def make_comet_logger(args) -> CometLogger:
-    """Build a CometLogger from parsed args, or a disabled one if unavailable."""
+    """Build a CometLogger from parsed args, or a disabled one if unavailable.
+
+    Args:
+        args: parsed args carrying comet (bool), comet_offline_dir, comet_project,
+            plus lr/epochs/hidden/seed which are logged as parameters.
+    """
     if not getattr(args, "comet", False):
         return CometLogger(None)
 
