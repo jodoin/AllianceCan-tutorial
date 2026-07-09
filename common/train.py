@@ -139,13 +139,14 @@ def main():
               f"({args.epochs}); nothing to do.", flush=True)
 
     test_acc = evaluate(model, X_test, y_test)
+    # Start SGD.  Note batch size = training set size
     for epoch in range(start_epoch, args.epochs):
-        model.train()
-        optimizer.zero_grad()
-        logits = model(X_train)
-        loss = criterion(logits, y_train)
-        loss.backward()
-        optimizer.step()
+        model.train()                       # set model in training mode
+        optimizer.zero_grad()               # reset gradients
+        logits = model(X_train)             # forward pass
+        loss = criterion(logits, y_train)   # compute loss
+        loss.backward()                     # compute gradients via backprop
+        optimizer.step()                    # gradient descent
 
         train_loss = loss.item()
         test_acc = evaluate(model, X_test, y_test)
