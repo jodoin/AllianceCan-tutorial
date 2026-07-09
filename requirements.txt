@@ -1,0 +1,24 @@
+# Python dependencies for the Narval moons tutorial.
+#
+# ON THE CLUSTER, do NOT `pip install -r requirements.txt` from the internet.
+# Compute nodes have no internet, so build ~/.venv_ai ONCE on the login node
+# from the Alliance wheelhouse with --no-index (see the top-level README):
+#
+#     module load python/3.11
+#     virtualenv --no-download ~/.venv_ai
+#     source ~/.venv_ai/bin/activate
+#     pip install --no-index --upgrade pip
+#     pip install --no-index torch scikit-learn numpy
+#     # optional, per example (check first: avail_wheels <name>):
+#     pip install --no-index hydra-core hydra-submitit-launcher   # examples 04, 05
+#     pip install --no-index comet-ml                             # example 06
+#
+# This file is here so the tutorial also runs on a plain laptop with ordinary
+# `pip install -r requirements.txt`.
+
+torch
+scikit-learn
+numpy
+hydra-core                 # examples 04, 05
+hydra-submitit-launcher    # example 05 (verify with avail_wheels on Narval)
+comet-ml                   # example 06 (verify with avail_wheels on Narval)

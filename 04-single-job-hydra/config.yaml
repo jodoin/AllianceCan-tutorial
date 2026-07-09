@@ -1,0 +1,25 @@
+# Hydra config for example 04 (single-job, config-driven).
+# Every field here can be overridden on the command line, e.g.:
+#   python ../common/train_hydra.py lr=0.1 epochs=100 device=cpu
+
+epochs: 50
+lr: 0.05
+seed: 0
+hidden: 16
+
+# device: cuda | cpu | auto
+#   train.py falls back to CPU automatically if 'cuda' is requested but no GPU
+#   is available, so this is safe to leave as cuda even when testing on a laptop.
+#   IMPORTANT: if you set device=cuda, job.sh MUST also request a GPU
+#   (#SBATCH --gpus-per-node=1). Those are two separate places — keep them in sync.
+device: cuda
+
+# Filled in by job.sh via CLI overrides so paths point at $SCRATCH at run time.
+data_dir: ???
+out_dir: ???
+checkpoint_dir: null
+
+# Keep Hydra's own output/logging dir tidy (relative to where you launch).
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d_%H-%M-%S}

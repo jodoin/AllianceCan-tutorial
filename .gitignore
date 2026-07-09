@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+
+# Hydra run/output dirs created next to the config
+outputs/
+multirun/
+
+# Local data/results if someone runs the tutorial from inside the repo
+moons-data/
+*.npz
+*.pt

@@ -1,0 +1,31 @@
+# Hydra config for example 05 (multi-jobs sweep via submitit -> Slurm).
+#
+# Running with --multirun and a sweep like `lr=0.001,0.01,0.1` makes Hydra
+# submit ONE Slurm job per value, using the submitit-slurm launcher configured
+# below. You launch this from the LOGIN node; submitit does the sbatch for you.
+
+defaults:
+  - override hydra/launcher: submitit_slurm
+
+epochs: 50
+lr: 0.05          # overridden per-run by the sweep on the command line
+seed: 0
+hidden: 16
+device: cpu       # set to cuda AND uncomment gpus_per_node below for a GPU sweep
+
+data_dir: ???     # provided on the CLI (points at $SCRATCH)
+out_dir: ???      # provided on the CLI
+checkpoint_dir: null
+
+hydra:
+  # submitit-slurm launcher = the bridge between Hydra --multirun and sbatch.
+  # These map onto the same #SBATCH directives you wrote by hand in 01-04.
+  launcher:
+    account: def-YOURPI          # REQUIRED: replace def-YOURPI.
+    timeout_min: 5               # wall-clock limit (minutes) == #SBATCH --time.
+    cpus_per_task: 1
+    mem_gb: 2
+    tasks_per_node: 1
+    # gpus_per_node: 1           # UNCOMMENT for a GPU sweep (and set device=cuda).
+  sweep:
+    dir: ${out_dir}/multirun     # where Hydra writes per-run logs on $SCRATCH
