@@ -16,8 +16,6 @@
 #SBATCH --output=slurm-%x-%j.out
 #SBATCH --requeue                   # let Slurm auto-resubmit us if preempted.
 #SBATCH --signal=B:TERM@30          # send SIGTERM to THIS script 30s before the kill.
-#SBATCH --mail-user=YOUR_EMAIL      # OPTIONAL. Replace or delete.
-#SBATCH --mail-type=END,FAIL
 
 set -euo pipefail
 

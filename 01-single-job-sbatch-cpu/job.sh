@@ -10,8 +10,6 @@
 #SBATCH --cpus-per-task=1           # CPU cores for the job.
 #SBATCH --mem=2G                    # RAM for the job.
 #SBATCH --output=slurm-%x-%j.out    # Stdout/stderr file (%x=job-name, %j=job-id).
-#SBATCH --mail-user=YOUR_EMAIL      # OPTIONAL: notifications. Replace or delete.
-#SBATCH --mail-type=END,FAIL        # OPTIONAL: when to email.
 
 set -euo pipefail
 

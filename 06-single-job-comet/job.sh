@@ -17,8 +17,6 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=2G
 #SBATCH --output=slurm-%x-%j.out
-#SBATCH --mail-user=YOUR_EMAIL      # OPTIONAL. Replace or delete.
-#SBATCH --mail-type=END,FAIL
 
 set -euo pipefail
 

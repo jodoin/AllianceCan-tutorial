@@ -11,8 +11,6 @@
 #SBATCH --cpus-per-task=4           # Narval has ~12 cores per GPU; 4 is plenty here.
 #SBATCH --mem=16G                   # Match the resources to the GPU you asked for.
 #SBATCH --output=slurm-%x-%j.out
-#SBATCH --mail-user=YOUR_EMAIL      # OPTIONAL. Replace or delete.
-#SBATCH --mail-type=END,FAIL
 
 set -euo pipefail
 

@@ -13,8 +13,6 @@
 #SBATCH --mem=2G
 #SBATCH --array=0-4                  # NEW: run 5 tasks, index 0..4. Each is its own job.
 #SBATCH --output=slurm-%x-%A_%a.out  # %A=array job id, %a=this task's index.
-#SBATCH --mail-user=YOUR_EMAIL       # OPTIONAL. Replace or delete.
-#SBATCH --mail-type=END,FAIL
 
 set -euo pipefail
 
